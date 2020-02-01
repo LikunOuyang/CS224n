@@ -1,4 +1,4 @@
-CS224n: Assignment #4
+# CS224n: Assignment #4 Neural Machine Translation with RNNs
 
 This assignment is split into two sections: Neural Machine Translation with RNNs and Analyzing NMT Systems. 
 
