@@ -1,4 +1,4 @@
-CS 224n Assignment #3: Dependency Parsing
+CS224n Assignment #3: Dependency Parsing
 
 In this assignment, you will build a neural dependency parser using PyTorch. 
 
