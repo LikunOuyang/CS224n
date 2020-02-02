@@ -73,7 +73,7 @@ class NMT(nn.Module):
         ###     Dropout Layer:
         ###         https://pytorch.org/docs/stable/nn.html#torch.nn.Dropout
 
-        self.encoder = nn.LSTM(embed_size, hidden_size, num_layers=1, bidirectional=True)
+        self.encoder = nn.LSTM(embed_size, hidden_size, dropout=self.dropout_rate, bidirectional=True)
         self.decoder = nn.LSTMCell(hidden_size+embed_size, hidden_size)
         self.h_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
         self.c_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
@@ -113,7 +113,7 @@ class NMT(nn.Module):
         enc_hiddens, dec_init_state = self.encode(source_padded, source_lengths)
         enc_masks = self.generate_sent_masks(enc_hiddens, source_lengths)
         combined_outputs = self.decode(enc_hiddens, enc_masks, dec_init_state, target_padded)
-        P = F.log_softmax(self.target_vocab_projection(combined_outputs), dim=1)
+        P = F.log_softmax(self.target_vocab_projection(combined_outputs), dim=-1)
 
         # Zero out, probabilities for which we have nothing in the target text
         target_masks = (target_padded != self.vocab.tgt['<pad>']).float()
