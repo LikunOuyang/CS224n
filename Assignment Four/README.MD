@@ -2,7 +2,7 @@
 
 This part is primarily coding and implementation focused. 
 
-For all results, please see test_outputs.txt file.
+For all results, please see **test_outputs.txt** file.
 
 some translated results are shown below:
 
