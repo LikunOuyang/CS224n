@@ -56,7 +56,7 @@ class VocabEntry(object):
         for i, c in enumerate(self.char_list):
             self.char2id[c] = len(self.char2id)
         self.char_unk = self.char2id['<unk>']
-        self.start_of_word = self.char2id["{"]
+        self.start_of_word = self.char2id["{"] 
         self.end_of_word = self.char2id["}"]
         assert self.start_of_word+1 == self.end_of_word
 
@@ -128,6 +128,8 @@ class VocabEntry(object):
         ###     You must prepend each word with the `start_of_word` character and append 
         ###     with the `end_of_word` character. 
 
+        word_ids = [[[self.start_of_word]+[self.char2id[c] for c in w]+[self.end_of_word] for w in s] for s in sents]
+        return word_ids
 
         ### END YOUR CODE
 
@@ -159,6 +161,10 @@ class VocabEntry(object):
         ###     Connect `words2charindices()` and `pad_sents_char()` which you've defined in 
         ###     previous parts
         
+        sents = self.words2charindices(sents)
+        sents_padded = pad_sents_char(sents, self['<pad>'])
+        sents_var = torch.tensor(sents_padded, dtype=torch.long, device=device)
+        return torch.transpose(sents_var, 0, 1)
 
         ### END YOUR CODE
 
