@@ -43,7 +43,7 @@ class ModelEmbeddings(nn.Module):
         ### YOUR CODE HERE for part 1j
 
         char_embed_size = 50
-        pad_token_idx = vocab.src['<pad>']
+        pad_token_idx = vocab.char2id['<pad>']
         self.char_embedding = nn.Embedding(len(vocab.char2id), char_embed_size, padding_idx=pad_token_idx)
         self.embed_size = embed_size
         self.cnn = CNN(char_embed_size, embed_size)

@@ -33,7 +33,7 @@ class Highway(nn.Module):
         x_gate = torch.sigmoid(self.W_gate(conv_out))
         x_highway = torch.mul(x_gate, x_proj) + torch.mul(conv_out, 1-x_gate)
 
-        return word_emb
+        return x_highway
 
 ### END YOUR CODE 
 
