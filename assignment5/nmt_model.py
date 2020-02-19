@@ -48,7 +48,7 @@ class NMT(nn.Module):
         self.vocab = vocab
 
         ### COPY OVER YOUR CODE FROM ASSIGNMENT 4
-        self.encoder = nn.LSTM(embed_size, hidden_size, dropout=self.dropout_rate, bidirectional=True)
+        self.encoder = nn.LSTM(embed_size, hidden_size, bidirectional=True)
         self.decoder = nn.LSTMCell(hidden_size+embed_size, hidden_size)
         self.h_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
         self.c_projection = nn.Linear(2*hidden_size, hidden_size, bias=False)
@@ -152,7 +152,6 @@ class NMT(nn.Module):
         ### Except replace "self.model_embeddings.source" with "self.model_embeddings_source"
 
         X = self.model_embeddings_source(source_padded)
-        b = X.shape[1]
         enc_hiddens, (last_hidden, last_cell) = self.encoder(nn.utils.rnn.pack_padded_sequence(X, source_lengths))
         enc_hiddens, __dummy = nn.utils.rnn.pad_packed_sequence(enc_hiddens)
 

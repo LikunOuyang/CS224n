@@ -42,11 +42,13 @@ class ModelEmbeddings(nn.Module):
 
         ### YOUR CODE HERE for part 1j
 
-        e_char = 50
-        self.embeddings = nn.Embedding(len(vocab.char2id), e_char)
+        char_embed_size = 50
+        pad_token_idx = vocab.src['<pad>']
+        self.char_embedding = nn.Embedding(len(vocab.char2id), char_embed_size, padding_idx=pad_token_idx)
         self.embed_size = embed_size
-        self.cnn = CNN(e_char, embed_size)
-        self.highway = Highway(embed_size, 0.3)
+        self.cnn = CNN(char_embed_size, embed_size)
+        self.highway = Highway(embed_size)
+        self.dropout = nn.Dropout(p=0.3)
 
 
         ### END YOUR CODE
@@ -67,12 +69,21 @@ class ModelEmbeddings(nn.Module):
 
         ### YOUR CODE HERE for part 1j
 
-        x_emb = self.embeddings(input)
-        x_reshape = torch.transpose(x_emb, 2, 3)
-        conv_out = self.cnn(x_reshape)
-        output = self.highway(conv_out)
-        return output
+        X_word_emb_list = []
+        # divide input into sentence_length batchs
+        for X_padded in input:
+            X_emb = self.char_embedding(X_padded)
+            X_reshaped = torch.transpose(X_emb, dim0=-1, dim1=-2)
+            # conv1d can only take 3-dim mat as input
+            # so it needs to concat/stack all the embeddings of word
+            # after going through the network
+            X_conv_out = self.cnn(X_reshaped)
+            X_highway = self.highway(X_conv_out)
+            X_word_emb = self.dropout(X_highway)
+            X_word_emb_list.append(X_word_emb)
 
+        X_word_emb = torch.stack(X_word_emb_list)
+        return X_word_emb
 
         ### END YOUR CODE
 

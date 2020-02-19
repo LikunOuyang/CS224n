@@ -11,17 +11,15 @@ class Highway(nn.Module):
     """ Highway Model:
         - Highway Networks6 have a skip-connection controlled by a dynamic gate
     """
-    def __init__(self, embed_size, dropout_rate=0.2):
+    def __init__(self, embed_size):
         """ Init Highway Model.
 
         @param embed_size (int): Embedding size (dimensionality)
-        @param dropout_rate (float): Dropout probability, for attention
         """
         super(Highway, self).__init__()
 
         self.W_proj = nn.Linear(embed_size, embed_size)
         self.W_gate = nn.Linear(embed_size, embed_size)
-        self.dropout = nn.Dropout3d(dropout_rate)
 
     def forward(self, conv_out):
         """ Take a mini-batch of output from CNN, compute the word embedding.
@@ -33,8 +31,8 @@ class Highway(nn.Module):
         
         x_proj = nn.functional.relu(self.W_proj(conv_out))
         x_gate = torch.sigmoid(self.W_gate(conv_out))
-        x_highway = x_gate*x_proj + (1-x_gate)*conv_out
-        word_emb = self.dropout(x_highway)
+        x_highway = torch.mul(x_gate, x_proj) + torch.mul(conv_out, 1-x_gate)
+
         return word_emb
 
 ### END YOUR CODE 

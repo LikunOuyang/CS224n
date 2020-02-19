@@ -11,7 +11,11 @@ class CNN(nn.Module):
     """ CNN Model:
         - CNN Networks to combine these character embeddings
     """
-    def __init__(self, e_char, f):
+    def __init__(self, 
+                e_char, 
+                f,
+                k=5,
+                max_word_len=21):
         """ Init CNN Model.
 
         @param e_char (int): Embedding size (dimensionality)
@@ -20,11 +24,11 @@ class CNN(nn.Module):
         """
         super(CNN, self).__init__()
 
-        self.cnn = nn.Conv1d(e_char, f, kernel_size=5, padding=1)
-        self.max_pool = nn.MaxPool1d(21-5+1)
+        self.cnn = nn.Conv1d(e_char, f, kernel_size=k)
+        self.max_pool = nn.MaxPool1d(max_word_len-k+1)
 
 
-    def forward(self, emb):
+    def forward(self, x_reshaped):
         """ Take a mini-batch of character embedding lookup, compute the CNN output.
 
         @param emb (Tensor): Tensor of integers of shape (sentence_length, batch_size, e_char, max_word_length) where
@@ -32,10 +36,10 @@ class CNN(nn.Module):
 
         @returns conv_out (Tensor): Tensor of integers of shape (sentence_length, batch_size, f)
         """
-        sentence_length, batch_size = emb.shape[0], emb.shape[1]
-        x_conv = self.cnn(emb.view(-1, emb.shape[2], emb.shape[3]))
+
+        x_conv = self.cnn(x_reshaped)
         conv_out = self.max_pool(nn.functional.relu(x_conv))
-        return conv_out.view(sentence_length, batch_size, -1)
+        return torch.squeeze(conv_out, -1)
 
 ### END YOUR CODE
 
