@@ -24,14 +24,14 @@ class Highway(nn.Module):
     def forward(self, conv_out):
         """ Take a mini-batch of output from CNN, compute the word embedding.
 
-        @param conv_out (Tensor): Tensor of integers of shape (sentence_length, batch_size, embed_size)
+        @param conv_out (Tensor): Tensor of integers of shape (sentence_length * batch_size, embed_size)
 
-        @returns word_emb (Tensor): Tensor of integers of shape (sentence_length, batch_size, embed_size)
+        @returns word_emb (Tensor): Tensor of integers of shape (sentence_length * batch_size, embed_size)
         """
         
         x_proj = nn.functional.relu(self.W_proj(conv_out))
         x_gate = torch.sigmoid(self.W_gate(conv_out))
-        x_highway = torch.mul(x_gate, x_proj) + torch.mul(conv_out, 1-x_gate)
+        x_highway = torch.mul(x_proj, x_gate) + torch.mul(conv_out, 1-x_gate)
 
         return x_highway
 

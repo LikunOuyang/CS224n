@@ -12,9 +12,9 @@ class CNN(nn.Module):
         - CNN Networks to combine these character embeddings
     """
     def __init__(self, 
-                e_char, 
-                f,
-                k=5,
+                char_embe_size, 
+                num_filters,
+                kernel_size=5,
                 max_word_len=21):
         """ Init CNN Model.
 
@@ -24,17 +24,17 @@ class CNN(nn.Module):
         """
         super(CNN, self).__init__()
 
-        self.cnn = nn.Conv1d(e_char, f, kernel_size=k)
-        self.max_pool = nn.MaxPool1d(max_word_len-k+1)
+        self.cnn = nn.Conv1d(char_embe_size, num_filters, kernel_size=kernel_size)
+        self.max_pool = nn.MaxPool1d(max_word_len - kernel_size + 1)
 
 
     def forward(self, x_reshaped):
         """ Take a mini-batch of character embedding lookup, compute the CNN output.
 
-        @param emb (Tensor): Tensor of integers of shape (sentence_length, batch_size, e_char, max_word_length) where
+        @param emb (Tensor): Tensor of integers of shape (sentence_length * batch_size, char_embe_size, max_word_length) where
             each integer is an element of the char embedding.
 
-        @returns conv_out (Tensor): Tensor of integers of shape (sentence_length, batch_size, f)
+        @returns conv_out (Tensor): Tensor of integers of shape (sentence_length * batch_size, num_filters)
         """
 
         x_conv = self.cnn(x_reshaped)

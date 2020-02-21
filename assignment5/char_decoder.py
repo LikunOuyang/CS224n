@@ -29,7 +29,8 @@ class CharDecoder(nn.Module):
         ###       - Create a new Embedding layer. Do not reuse embeddings created in Part 1 of this assignment.
 
         super(CharDecoder, self).__init__()
-        self.charDecoder = nn.LSTM(char_embedding_size, hidden_size, num_layers=1, bidirectional=False)
+        self.char_embedding_size = char_embedding_size
+        self.charDecoder = nn.LSTM(char_embedding_size, hidden_size)
         self.char_output_projection = nn.Linear(hidden_size, len(target_vocab.char2id))
         self.target_vocab = target_vocab
         self.padding_idx = self.target_vocab.char2id['<pad>']
@@ -73,7 +74,7 @@ class CharDecoder(nn.Module):
 
         scores, dec_hidden = self.forward(char_sequence[:-1], dec_hidden)
         loss_module = nn.CrossEntropyLoss(ignore_index=self.padding_idx, reduction='sum')
-        cross_entropy_loss = loss_module(scores.permute(1, 2, 0), char_sequence[1:].transpose(1, 0))
+        cross_entropy_loss = loss_module(scores.view(-1, scores.shape[-1]), char_sequence[1:].contiguous().view(-1))
         return cross_entropy_loss
 
 
@@ -109,18 +110,18 @@ class CharDecoder(nn.Module):
         for i in range(max_length):
             scores, dec_hidden = self.forward(current_char, dec_hidden)
             current_char = scores.argmax(-1)
-            output_words += [current_char]
+            decodedWords += [current_char]
 
-        output_words = torch.cat(output_words).t().tolist()
-        for output_word in output_words:
+        decodedWords = torch.stack(decodedWords, dim=0).permute(2, 1, 0).squeeze(1).tolist()
+        for output_word in decodedWords:
             word = ""
             for char in output_word:
                 if char == end_idx:
                     break
                 word += self.target_vocab.id2char[char]
-            decodedWords += [word]
+            output_words += [word]
 
-        return decodedWords
+        return output_words
 
         ### END YOUR CODE
 

@@ -117,8 +117,6 @@ class NMT(nn.Module):
         target_gold_words_log_prob = torch.gather(P, index=target_padded[1:].unsqueeze(-1), dim=-1).squeeze(-1) * target_masks[1:]
         scores = target_gold_words_log_prob.sum() # mhahn2 Small modification from A4 code.
 
-
-
         if self.charDecoder is not None:
             max_word_len = target_padded_chars.shape[-1]
 
