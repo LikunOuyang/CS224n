@@ -41,8 +41,17 @@ def pad_sents_char(sents, char_pad_token):
     ###     You should NOT use the method `pad_sents()` below because of the way it handles
     ###     padding and unknown words.
 
-    max_sent_len = max(len(s) for s in sents)
-    sents_padded = [[w[:min(len(w), max_word_length)] + [char_pad_token for i in range(max_word_length-len(w))]  for w in s] + [[char_pad_token for i in range(max_word_length)] for i in range(max_sent_len - len(s))] for s in sents]
+    sents_padded = []
+    max_len = max([len(sent) for sent in sents])
+    word_padded = [char_pad_token] * max_word_length
+    for sent in sents:
+        words_padded = []
+        for word in sent:
+            if len(word) > max_word_length:
+                words_padded.append(word[:max_word_length])
+            else:
+                words_padded.append(word + [char_pad_token] * (max_word_length - len(word)))
+        sents_padded.append(words_padded + [word_padded] * max(0, max_len - len(words_padded)))
 
     ### END YOUR CODE
 
@@ -63,8 +72,8 @@ def pad_sents(sents, pad_token):
 
     ### COPY OVER YOUR CODE FROM ASSIGNMENT 4
     
-    max_len = max(len(sent) for sent in sents)
-    sents_padded = [sent + [pad_token] * (max_len - len(sent)) for sent in sents]
+    max_len = max([len(sent) for sent in sents])
+    sents_padded = [sent + [pad_token] * max(0, max_len - len(sent)) for sent in sents]
 
     ### END YOUR CODE FROM ASSIGNMENT 4
 
